@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "imageclip-factory"
+version = "0.1.0"
+description = "A simple factory for creating ImageClip objects in MoviePy."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+    { name = "Hao Nghiem", email = "qtvhao@gmail.com" }
+]
+dependencies = [
+    "moviepy>=2.1.2,<3.0",
+    "pydub==0.25.1"
+]
+keywords = ["audio", "moviepy", "imageclip", "factory"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/qtvhao/ImageClipFactory.py"
+Repository = "https://github.com/qtvhao/ImageClipFactory.py"
+
+[tool.setuptools]
+packages = ["imageclip_factory"]
+
+[project.scripts]
+imageclip-factory = "imageclip_factory.cli:main"
