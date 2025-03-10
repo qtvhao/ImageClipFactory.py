@@ -14,7 +14,7 @@ authors = [
 ]
 dependencies = [
     "moviepy>=2.1.2,<3.0",
-    "pydub==0.25.1"
+    "requests==2.32.3"
 ]
 keywords = ["audio", "moviepy", "imageclip", "factory"]
 classifiers = [
