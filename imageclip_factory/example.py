@@ -64,7 +64,9 @@ if __name__ == "__main__":
     
     # Create slideshow clip from downloaded images
     if downloaded_images:
-        slideshow_clip = ImageClipFactory.create_slideshow_clip(downloaded_images, duration_per_image=2, effects=['center_foreground,2880,1920'])
+        slideshow_clip = ImageClipFactory.create_slideshow_clip(downloaded_images, duration_per_image=6, effects=[
+            'center_foreground,2880,1920,300'
+        ])
         
         if slideshow_clip:
             video_output_file = Path("nanotechnology_slideshow.mp4")

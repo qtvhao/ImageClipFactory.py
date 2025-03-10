@@ -5,6 +5,7 @@ from moviepy import concatenate_videoclips
 from moviepy import CompositeVideoClip
 from .MoveClipHorizontally import MoveClipHorizontally
 from .GaussianBlur import GaussianBlur
+import numpy as np
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -54,13 +55,14 @@ class ImageClipFactory:
                         try:
                             expected_width = int(effect_params[0])
                             expected_height = int(effect_params[1])
+                            expected_animate_distance = int(effect_params[2])
 
                             logger.info(f"Centering foreground on background with width: {expected_width}, height: {expected_height}")
 
                             clip = ImageClipFactory.create_centered_foreground_on_background(
                                 clip.with_effects([
-                                    GaussianBlur(55),
-                                    MoveClipHorizontally(clip.w - 300, clip.h, 300 / duration, 0),
+                                    GaussianBlur(blur_radius=lambda t: 10 + 5 * np.sin(2 * np.pi * 0.5 * t)),
+                                    MoveClipHorizontally(clip.w - expected_animate_distance, clip.h, expected_animate_distance / duration, 0),
                                 ]),
                                 clip,
                                 expected_width,
@@ -109,32 +111,43 @@ class ImageClipFactory:
     @staticmethod
     def resize_clip(clip: VideoClip, target_width, target_height):
         """
-        Resize a clip if its dimensions are greater than or less than
-        the specified target width or height, maintaining aspect ratio.
+        Resize a clip to cover the target size while maintaining aspect ratio.
+        This may result in cropping (similar to CSS object-fit: cover).
         """
         width, height = clip.size
-        logger.debug(f"Resizing clip if necessary. Current size: ({width}, {height}), target size: ({target_width}, {target_height})")
+        logger.debug(f"Original clip size: ({width}, {height}), Target size: ({target_width}, {target_height})")
 
-        # Calculate scale factors for width and height
+        # Calculate scale factors
         width_scale = target_width / width
         height_scale = target_height / height
 
-        # Choose the smaller scale factor to maintain aspect ratio
-        scale_factor = min(width_scale, height_scale)
+        # Choose the larger scale factor to ensure coverage
+        scale_factor = max(width_scale, height_scale)
 
-        # Only resize if scale_factor is not 1 (different size)
-        if scale_factor != 1:
-            new_width = int(width * scale_factor)
-            new_height = int(height * scale_factor)
-            logger.info(f"Resizing clip from ({width}, {height}) to ({new_width}, {new_height})")
+        # New scaled dimensions
+        new_width = int(width * scale_factor)
+        new_height = int(height * scale_factor)
 
-            resized_clip = clip.resized(new_size=(new_width, new_height))
-            logger.debug(f"Clip resized to: {resized_clip.size}")
-            return resized_clip
-        else:
-            logger.debug("No resizing needed for clip.")
-        
-        return clip
+        logger.info(f"Resizing clip to cover target. New size: ({new_width}, {new_height}), Scale factor: {scale_factor}")
+
+        # Resize the clip
+        resized_clip = clip.resized(new_size=(new_width, new_height))
+
+        # Calculate crop coordinates (center crop)
+        x_center = new_width / 2
+        y_center = new_height / 2
+        x1 = x_center - target_width / 2
+        y1 = y_center - target_height / 2
+        x2 = x_center + target_width / 2
+        y2 = y_center + target_height / 2
+
+        logger.debug(f"Cropping area: x1={x1}, y1={y1}, x2={x2}, y2={y2}")
+
+        # Crop the resized clip to the target dimensions
+        cropped_clip = resized_clip.cropped(x1=x1, y1=y1, x2=x2, y2=y2)
+        logger.debug(f"Cropped clip size: {cropped_clip.size}")
+
+        return cropped_clip
 
     @staticmethod
     def create_centered_foreground_on_background(background_clip: VideoClip, foreground_clip: VideoClip, expected_width, expected_height):
