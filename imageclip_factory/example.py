@@ -1,5 +1,6 @@
 import requests
 from pathlib import Path
+from tempfile import gettempdir
 from moviepy import VideoClip
 from .image_clip_factory import ImageClipFactory  # Assuming this is your module
 
@@ -48,10 +49,14 @@ if __name__ == "__main__":
     base_url = "https://http-fotosutokku-kiban-production-80.schnworks.com/search?query=Nanotechnology&limit=10&output=image&index={index}"
     downloaded_images = []
 
+    # Get the temporary directory
+    tmp_dir = Path(gettempdir())
+    print(f"Using temporary directory: {tmp_dir}")
+
     # Download images from index 1 to index 4
-    for i in range(1, 5):
+    for i in range(1, 3):
         image_url = base_url.format(index=i)
-        output_file = Path(f"nanotechnology_image_{i}.jpg")
+        output_file = tmp_dir / f"nanotechnology_image_{i}.jpg"
         downloaded_image_path = download_image(image_url, output_file)
         
         if downloaded_image_path:
@@ -59,7 +64,7 @@ if __name__ == "__main__":
     
     # Create slideshow clip from downloaded images
     if downloaded_images:
-        slideshow_clip = ImageClipFactory.create_slideshow_clip(downloaded_images, duration_per_image=5)
+        slideshow_clip = ImageClipFactory.create_slideshow_clip(downloaded_images, duration_per_image=2, effects=['center_foreground,2880,1920'])
         
         if slideshow_clip:
             video_output_file = Path("nanotechnology_slideshow.mp4")
