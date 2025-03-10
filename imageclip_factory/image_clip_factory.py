@@ -61,7 +61,7 @@ class ImageClipFactory:
 
                             clip = ImageClipFactory.create_centered_foreground_on_background(
                                 clip.with_effects([
-                                    GaussianBlur(blur_radius=lambda t: 10 + 5 * np.sin(2 * np.pi * 0.5 * t)),
+                                    GaussianBlur(blur_radius=lambda t: 15 + 5 * np.sin(2 * np.pi * 0.5 * t)),
                                     MoveClipHorizontally(clip.w - expected_animate_distance, clip.h, expected_animate_distance / duration, 0),
                                 ]),
                                 clip,
