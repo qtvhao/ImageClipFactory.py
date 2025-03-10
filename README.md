@@ -1,0 +1,1 @@
+# ImageClipFactory.py
