@@ -44,8 +44,6 @@ class MoveClipHorizontally(Effect):
         def filter(get_frame, t):
             # Calculate new horizontal position over time
             x = int(max(0, min(x_max, self.x_start + (self.x_speed * t))))
-            print(f"{x} {t}")
-            print(f"x: {x} {x_max}")
             y = 0  # Keep y fixed at the top
 
             # Extract the frame window
